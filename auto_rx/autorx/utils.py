@@ -11,6 +11,8 @@ import codecs
 import fcntl
 import logging
 import os
+import signal
+import sys
 import platform
 import re
 import requests
@@ -792,10 +794,12 @@ def is_rtlsdr(vid, pid):
 def reset_rtlsdr_by_serial(serial):
     """ Attempt to reset a RTLSDR with a provided serial number """
 
-    # If not Linux, raise exception and let auto_rx.py convert it to exit status code.
+    # if not linux then terminate
     if is_not_linux():
-        logging.debug("RTLSDR - Not a native Linux system, skipping reset attempt.")
-        raise SystemError("SDR unresponsive")
+        print("RTLSDR - Not a native Linux system, skipping reset attempt.")
+        #raise SystemError("SDR unresponsive")
+        os.kill(os.getpid(),signal.SIGKILL)
+        #sys.exit(3)
 
     lsusb_info = lsusb()
     bus_num = None
@@ -869,10 +873,12 @@ def find_rtlsdr(serial=None):
 def reset_all_rtlsdrs():
     """ Reset all RTLSDR devices found in the lsusb tree """
 
-    # If not Linux, raise exception and let auto_rx.py convert it to exit status code.
+    # If not Linux then terminate.
     if is_not_linux():
-        logging.debug("RTLSDR - Not a native Linux system, skipping reset attempt.")
-        raise SystemError("SDR unresponsive")
+        print("RTLSDR - Not a native Linux system, skipping reset attempt.")
+        os.kill(os.getpid(),signal.SIGKILL)
+        #sys.exit(3)
+        #raise SystemError("SDR unresponsive")
 
     lsusb_info = lsusb()
     bus_num = None
